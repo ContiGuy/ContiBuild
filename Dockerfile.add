@@ -1,0 +1,20 @@
+FROM conti-guy/conti-build
+
+ARG UserID
+ARG GroupID
+
+#
+# play around
+#
+
+# RUN apt-get install -y upx
+
+# # install purescript and it's tools
+# RUN npm install -g purescript
+# RUN npm install -g pulp
+# RUN npm install -g bower
+
+# RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+# RUN apt-get update
+# RUN apt-get install -y nodejs
+

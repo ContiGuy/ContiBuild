@@ -1,0 +1,51 @@
+# FROM golang:alpine  -- small but not based on debian/ubuntu, so no apt packages available
+# FROM golang:wheezy
+FROM golang
+
+#
+# setup Elm environment
+#
+
+# install npm
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+RUN apt-get update
+RUN apt-get install -y nodejs
+
+# install elm
+RUN npm install -g elm
+
+# # install purescript and it's tools
+# RUN npm install -g purescript pulp bower
+
+
+# open port for elm reactor
+##EXPOSE 8000
+
+# ENTRYPOINT [ "elm" ]
+
+#
+# setup Go environment
+#
+
+WORKDIR /go/src
+
+# # add a helper tool written in Go
+# ADD gopath gopath
+# RUN go install gopath
+# RUN GOOS=windows GOARCH=amd64 go install gopath
+
+# add a helper tool written in Go
+ADD cobui cobui
+RUN go install --race cobui
+##RUN GOOS=windows GOARCH=amd64 go install cobui
+
+# create a non root developer user with the same user id as the developer who builds the docker image so that later the built files can be owned by him
+ARG UserID
+ARG GroupID
+RUN addgroup --gid "${GroupID}" developer
+
+# FIXME: need to prevent interactive output
+RUN adduser --uid "${UserID}" --gid "${GroupID}" developer
+
+# open port for go doc
+##EXPOSE 6060

@@ -1,0 +1,65 @@
+FROM conti-guy/conti-build.base
+
+#
+# setup Elm environment
+#
+
+# # install npm
+# RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+# RUN apt-get update
+# RUN apt-get install -y nodejs
+
+# # install elm
+# RUN npm install -g elm
+
+# open port for elm reactor
+# EXPOSE 8000
+
+
+#
+# setup Go environment
+#
+
+WORKDIR /go/src
+
+# # add a helper tool written in Go
+# ADD gopath gopath
+# RUN go install gopath
+# RUN GOOS=windows GOARCH=amd64 go install gopath
+
+# # add a vendoring tool written in Go
+# RUN go get github.com/FiloSottile/gvt
+# RUN go install github.com/FiloSottile/gvt
+# 
+# # add a vendoring tool written in Go
+# RUN go get github.com/spf13/cobra
+# RUN go install github.com/FiloSottile/gvt
+
+# add a some tools written in Go
+RUN for pkg in \
+	github.com/FiloSottile/gvt \
+	github.com/spf13/cobra \
+	github.com/spf13/cobra/cobra \
+	github.com/benbjohnson/ego \
+	github.com/benbjohnson/ego/cmd/ego \
+    ; do go get "$pkg" && go install "$pkg"; done
+# RUN cp /go/bin/* /usr/local/bin
+RUN cd /go/bin && cp $(ls | grep -v _) /usr/local/go/bin
+
+# RUN find github.com/spf13/cobra -type d
+
+
+# add some more useful tools
+RUN apt-get install -y upx
+
+
+# # create a non root developer user with the same user id as the developer who builds the docker image so that later the built files can be owned by him
+ARG UserID
+ARG GroupID
+# RUN addgroup --gid "${GroupID}" developer
+
+# # FIXME: need to prevent interactive output
+# RUN adduser --uid "${UserID}" --gid "${GroupID}" developer
+
+# # open port for go doc
+# EXPOSE 6060
