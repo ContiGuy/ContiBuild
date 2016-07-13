@@ -18,3 +18,7 @@ ARG GroupID
 # RUN apt-get update
 # RUN apt-get install -y nodejs
 
+# ensure that the developer can actually create libraries and binaries
+RUN chown -R developer:developer /go   # && chmod -R a+rwx /go
+
+

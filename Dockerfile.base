@@ -34,11 +34,6 @@ WORKDIR /go/src
 # RUN go install gopath
 # RUN GOOS=windows GOARCH=amd64 go install gopath
 
-# add a helper tool written in Go
-ADD cobui cobui
-RUN go install --race cobui
-##RUN GOOS=windows GOARCH=amd64 go install cobui
-
 # create a non root developer user with the same user id as the developer who builds the docker image so that later the built files can be owned by him
 ARG UserID
 ARG GroupID
@@ -47,8 +42,13 @@ RUN addgroup --gid "${GroupID}" developer
 # FIXME: need to prevent interactive output
 RUN adduser --uid "${UserID}" --gid "${GroupID}" developer
 
+# add a helper tool written in Go
+ADD cobui cobui
+RUN go install --race cobui
+##RUN GOOS=windows GOARCH=amd64 go install cobui
+
 # ensure that the developer can actually create libraries and binaries
-RUN chown -R developer:developer /go
+RUN chown -R developer:developer /go   # && chmod -R a+rwx /go
 
 # open port for go doc
 ##EXPOSE 6060

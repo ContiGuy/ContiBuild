@@ -46,6 +46,10 @@ else
 #	exit 29
 
 	V="-v $(pwd):/go/src/$GOPKG"
+	# VBIN="-v $(pwd):/go/bin"
+	XBIN="/tmp/conti-build/bin"
+	mkdir -p "$XBIN"
+	VBIN="-v $XBIN:/go/bin"
 	# W="-w $SCR_DIR"
 fi
 ##SCR_DIR="/go/src/$GOPKG"
@@ -88,12 +92,13 @@ fi
 
 $SUDO docker run \
 	-t --rm \
-	$V $W \
+	$V $VBIN $W \
 	-e "HOME=/tmp" \
 	$PROXY \
 	$PORTS \
 	-u $(id -u):$(id -g) \
 	"$DOCKER_IMAGE" \
-	bash -c "$@"
+	"$@"
 
+	## bash -c "$@"
 	## "$@"

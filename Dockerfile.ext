@@ -61,5 +61,8 @@ ARG GroupID
 # # FIXME: need to prevent interactive output
 # RUN adduser --uid "${UserID}" --gid "${GroupID}" developer
 
+# ensure that the developer can actually create libraries and binaries
+RUN chown -R developer:developer /go   # && chmod -R a+rwx /go
+
 # # open port for go doc
 # EXPOSE 6060
