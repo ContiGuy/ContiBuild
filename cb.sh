@@ -26,7 +26,7 @@
 # don't change this! - needed if docker needs to be run via sudo
 DOCKER_IMAGE=zZz
 
-SCR_DIR=/source
+##SCR_DIR=/source
 
 if which cobui > /dev/null; then :
 else
@@ -36,14 +36,20 @@ fi
 
 if GOBASE=$(cobui gopath --base 2>/dev/null) && GOPKG=$(cobui gopath --package 2>/dev/null) ; then
 	V="-v $GOBASE:/go"
-	W="-w /go/src/$GOPKG"
+	# W="-w /go/src/$GOPKG"
 else
+	WD="$(pwd)"
+	GOPKG="$(basename $WD)"
+	# SCR_DIR="/go/src/$GOPKG"
+
 #	echo "Please make sure your source code is in the current directory and is in a proper Go workspace and the GOPATH environment variable is set correctly"
 #	exit 29
 
-	V="-v $(pwd):$SCR_DIR"
-	W="-w $SCR_DIR"
+	V="-v $(pwd):/go/src/$GOPKG"
+	# W="-w $SCR_DIR"
 fi
+##SCR_DIR="/go/src/$GOPKG"
+W="-w /go/src/$GOPKG"
 
 #if echo "$*" | grep -e "^elm " -e "^psc " -e "^pulp " -e "^bower "  > /dev/null ; then
 #	V="-v $(pwd):$SCR_DIR"
@@ -88,5 +94,6 @@ $SUDO docker run \
 	$PORTS \
 	-u $(id -u):$(id -g) \
 	"$DOCKER_IMAGE" \
-	"$@"
+	bash -c "$@"
 
+	## "$@"

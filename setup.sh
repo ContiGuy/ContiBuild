@@ -87,7 +87,7 @@ fi
 
 cat cb.sh |
 	sed -e "s%^# SUDO=.*%SUDO=$SUDO%" \
-		-e "s%^DOCKER_IMAGE=.*%DOCKER_IMAGE='$DOCKER_IMAGE_ENV'%" \
+		-e "s%^DOCKER_IMAGE=.*%DOCKER_IMAGE='$DOCKER_IMAGE_FINAL'%" \
 		-e "s%^# Copyright.*%$COPYRIGHT%" \
 	> "$TOOLS_DIR/cb" || exit 31
 
