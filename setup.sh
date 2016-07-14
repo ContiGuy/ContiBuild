@@ -29,6 +29,15 @@ else
 	SUDO=sudo
 fi
 
+function getwd ()
+{
+	if PwdCmd=$(which pwd) ; then
+		"$PwdCmd"
+	else
+		pwd
+	fi
+}
+
 if [ "XX$http_proxy" != "XX" ] ; then
 PROXY="--build-arg HTTP_PROXY=$http_proxy \
 	--build-arg http_proxy=$http_proxy \
@@ -92,7 +101,7 @@ cat cb.sh |
 	> "$TOOLS_DIR/cb" || exit 31
 
 ## for tool in go gvt cobra ego elm psc pulp upx ; do
-for tool in go gvt cobra ego elm upx ; do
+for tool in go gvt cobra ego elm upx make ; do
 	## cat > "$TOOLS_DIR/$tool" <<EOF
 	cat <<EOF | sed -e "s%^# Copyright.*%$COPYRIGHT%" > "$TOOLS_DIR/$tool"
 #!/bin/bash

@@ -34,18 +34,30 @@ else
 	exit 23
 fi
 
+function getwd ()
+{
+	if PwdCmd=$(which pwd) ; then
+		"$PwdCmd"
+	else
+		pwd
+	fi
+}
+
+
 if GOBASE=$(cobui gopath --base 2>/dev/null) && GOPKG=$(cobui gopath --package 2>/dev/null) ; then
 	V="-v $GOBASE:/go"
 	# W="-w /go/src/$GOPKG"
 else
-	WD="$(pwd)"
+	# WD="$(pwd)"
+	WD="$(getwd)"
 	GOPKG="$(basename $WD)"
 	# SCR_DIR="/go/src/$GOPKG"
 
 #	echo "Please make sure your source code is in the current directory and is in a proper Go workspace and the GOPATH environment variable is set correctly"
 #	exit 29
 
-	V="-v $(pwd):/go/src/$GOPKG"
+	# V="-v $(pwd):/go/src/$GOPKG"
+	V="-v $(getwd):/go/src/$GOPKG"
 	# VBIN="-v $(pwd):/go/bin"
 	XBIN="/tmp/conti-build/bin"
 	mkdir -p "$XBIN"

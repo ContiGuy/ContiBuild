@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/yookoala/realpath"
 )
 
 var (
@@ -94,42 +95,65 @@ func splitGoPath() ([]string, error) {
 		errMsg := fmt.Sprint("GOPATH environment variable must be set")
 		return nil, errors.New(errMsg)
 	}
-	wd, err := os.Getwd()
+
+	var err error
+	wd := [3]string{}
+	//	rwd, err := os.Getwd()
+	wd[0], err = os.Getwd()
 	if err != nil {
 		panic(err)
 	}
+	//	xwd, err := filepath.Abs(rwd)
+	wd[1], err = filepath.Abs(wd[0])
+	if err != nil {
+		panic(err)
+	}
+	//	awd, err := realpath.Realpath(xwd)
+	wd[2], err = realpath.Realpath(wd[1])
+	if err != nil {
+		panic(err)
+	}
+
 	ret := make([]string, 0, 2)
 	goPath := ""
 	goPath_l := strings.Split(goPath_s, ":")
+	awd := ""
+gopathLoop:
 	for _, goPath = range goPath_l {
 		goPathPrefix := filepath.Join(goPath, "src")
-		if strings.HasPrefix(wd, goPathPrefix) {
-			if *debug {
-				log.Printf("gopath='%s'\n", goPath)
+		for i := range wd {
+			//			if strings.HasPrefix(awd, goPathPrefix) {
+			if strings.HasPrefix(wd[i], goPathPrefix) {
+				if *debug {
+					log.Printf("gopath='%s'\n", goPath)
+				}
+				ret = append(ret, goPath)
+				awd = wd[i]
+				break gopathLoop
 			}
-			ret = append(ret, goPath)
-			break
 		}
 	}
+	if *debug {
+		log.Printf("wd=%q, awd='%s', gopaths=%q, goPath='%s', len(goPath)=%d\n",
+			wd, awd, goPath_l, goPath, len(goPath))
+		//		log.Printf("wd='%s', awd='%s', len(awd)=%d, goPath='%s', len(goPath)=%d\n",
+		//			rwd, awd, len(awd), goPath, len(goPath))
+	}
+
 	if len(ret) == 0 {
 		//		fmt.Fprintln(os.Stderr, "not in a subfolder of $GOPATH/src")
 		errMsg := fmt.Sprint("not in a subfolder of $GOPATH/src")
 		return nil, errors.New(errMsg)
 	}
-	if *debug {
-		log.Printf("wd='%s', len(wd)=%d, goPath='%s', len(goPath)=%d\n",
-			wd, len(wd), goPath, len(goPath))
-	}
-
 	goPathBaseLen := len(goPath) + 1 + 4
-	if len(wd) <= goPathBaseLen {
+	if len(awd) <= goPathBaseLen {
 		//		fmt.Fprintln(os.Stderr, "not in a subfolder of $GOPATH/src")
 		//		return ret
 		errMsg := fmt.Sprint("not in a subfolder of $GOPATH/src")
 		return ret, errors.New(errMsg)
 	}
 
-	goPkg := wd[goPathBaseLen:]
+	goPkg := awd[goPathBaseLen:]
 	ret = append(ret, goPkg)
 	return ret, nil
 }
