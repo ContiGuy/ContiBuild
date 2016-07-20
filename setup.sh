@@ -20,6 +20,8 @@ COPYRIGHT='# Copyright © 2016 - present:  Conti Guy  <mrcs.contiguy@mailnull.co
 # build the docker image
 #
 
+ODEN_VERSION="--build-arg OdenVersion=0.3.5"
+
 DOCKER_IMAGE_BASE="conti-guy/conti-build.base"
 DOCKER_IMAGE_ENV="conti-guy/conti-build"
 DOCKER_IMAGE_FINAL="conti-guy/conti-build.add"
@@ -56,7 +58,7 @@ else
 fi
 
 echo "building extended docker image ..."
-if $SUDO docker build -f Dockerfile.ext -t "$DOCKER_IMAGE_ENV" $PROXY $USER_IDs . ; then
+if $SUDO docker build -f Dockerfile.ext -t "$DOCKER_IMAGE_ENV" $PROXY $USER_IDs $ODEN_VERSION . ; then
 	echo "done."
 else
 	echo "FAILED. ABORT."
@@ -101,7 +103,7 @@ cat cb.sh |
 	> "$TOOLS_DIR/cb" || exit 31
 
 ## for tool in go gvt cobra ego elm psc pulp upx ; do
-for tool in go gvt cobra ego elm upx make ; do
+for tool in go gvt cobra ego gometalinter oden elm upx make ; do
 	## cat > "$TOOLS_DIR/$tool" <<EOF
 	cat <<EOF | sed -e "s%^# Copyright.*%$COPYRIGHT%" > "$TOOLS_DIR/$tool"
 #!/bin/bash

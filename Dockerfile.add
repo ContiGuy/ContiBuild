@@ -21,4 +21,36 @@ ARG GroupID
 # ensure that the developer can actually create libraries and binaries
 RUN chown -R developer:developer /go   # && chmod -R a+rwx /go
 
+# RUN go get -u github.com/alecthomas/gometalinter
+# RUN go install github.com/alecthomas/gometalinter
 
+
+# copy go tools to make them usable
+RUN cd /go/bin && cp $(ls | grep -v _) /usr/local/go/bin
+
+# RUN gometalinter --install --update
+
+# RUN apt-get update
+# RUN apt-get install -y libpcre3-dev
+
+# RUN mkdir -p /source
+# WORKDIR /source
+
+# # RUN git clone https://github.com/oden-lang/oden.git
+
+# RUN wget https://github.com/oden-lang/oden/releases/download/0.3.5/oden-0.3.5-linux.tar.gz && tar xvzf oden-0.3.5-linux.tar.gz
+
+# WORKDIR /source/oden
+
+# RUN mkdir -p /usr/local/go/bin  /usr/local/go/lib  /usr/local/go/doc
+# RUN cp bin/* /usr/local/go/bin
+# RUN cp -R doc/* /usr/local/go/doc
+# RUN cp -R lib/* /usr/local/go/lib
+
+# RUN ls -laR /usr/local/go/bin  /usr/local/go/lib
+
+# RUN stack setup
+# RUN stack build
+# RUN make test
+
+# RUN ls -la  /usr/local/go/bin
