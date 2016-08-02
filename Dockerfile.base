@@ -52,3 +52,5 @@ RUN chown -R developer:developer /go   # && chmod -R a+rwx /go
 
 # open port for go doc
 ##EXPOSE 6060
+
+ARG OdenVersion

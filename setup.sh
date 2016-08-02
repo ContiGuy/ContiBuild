@@ -26,19 +26,14 @@ DOCKER_IMAGE_BASE="conti-guy/conti-build.base"
 DOCKER_IMAGE_ENV="conti-guy/conti-build"
 DOCKER_IMAGE_FINAL="conti-guy/conti-build.add"
 
+DOCKER_IMAGE_ELM="conti-guy/conti-build.elm"
+
+. conti-build-lib.sh
+
 if docker version ; then :
 else
 	SUDO=sudo
 fi
-
-function getwd ()
-{
-	if PwdCmd=$(which pwd) ; then
-		"$PwdCmd"
-	else
-		pwd
-	fi
-}
 
 if [ "XX$http_proxy" != "XX" ] ; then
 PROXY="--build-arg HTTP_PROXY=$http_proxy \
@@ -49,29 +44,46 @@ fi
 
 USER_IDs="--build-arg UserID=$(id -u) --build-arg GroupID=$(id -g)"
 
-echo "building base docker image ..."
-if $SUDO docker build -f Dockerfile.base -t "$DOCKER_IMAGE_BASE" $PROXY $USER_IDs . ; then
-	echo "done."
-else
-	echo "FAILED. ABORT."
-	exit 29
-fi
+docker_build base Dockerfile.base "$DOCKER_IMAGE_BASE" 33
+#~ echo "building base docker image ..."
+#~ if $SUDO docker build -f Dockerfile.base -t "$DOCKER_IMAGE_BASE" $PROXY $USER_IDs . ; then
+	#~ echo "done."
+#~ else
+	#~ echo "FAILED. ABORT."
+	#~ exit 29
+#~ fi
 
-echo "building extended docker image ..."
-if $SUDO docker build -f Dockerfile.ext -t "$DOCKER_IMAGE_ENV" $PROXY $USER_IDs $ODEN_VERSION . ; then
-	echo "done."
-else
-	echo "FAILED. ABORT."
-	exit 29
-fi
+docker_build extended Dockerfile.ext "$DOCKER_IMAGE_ENV" 43
+#~ echo "building extended docker image ..."
+#~ if $SUDO docker build -f Dockerfile.ext -t "$DOCKER_IMAGE_ENV" $PROXY $USER_IDs $ODEN_VERSION . ; then
+	#~ echo "done."
+#~ else
+	#~ echo "FAILED. ABORT."
+	#~ exit 29
+#~ fi
 
-echo "building playground docker image ..."
-if $SUDO docker build -f Dockerfile.add -t "$DOCKER_IMAGE_FINAL" $PROXY $USER_IDs . ; then
-	echo "done."
-else
-	echo "FAILED. ABORT."
-	exit 29
-fi
+docker_build playground Dockerfile.add "$DOCKER_IMAGE_FINAL" 53
+#~ echo "building playground docker image ..."
+#~ if $SUDO docker build -f Dockerfile.add -t "$DOCKER_IMAGE_FINAL" $PROXY $USER_IDs . ; then
+	#~ echo "done."
+#~ else
+	#~ echo "FAILED. ABORT."
+	#~ exit 29
+#~ fi
+
+
+# DOCKER_IMAGE_ELM="conti-guy/conti-build.elm"
+
+docker_build elm elm.Dockerfile "$DOCKER_IMAGE_ELM" 63
+#~ echo "building elm docker image ..."
+#~ if $SUDO docker build -f elm.Dockerfile -t "$DOCKER_IMAGE_ELM" $PROXY $USER_IDs . ; then
+	#~ echo "done."
+#~ else
+	#~ echo "FAILED. ABORT."
+	#~ exit 29
+#~ fi
+
+
 
 TOOLS_DIR="$(pwd)/conti-build-tools"
 LT="-v $TOOLS_DIR:/conti-build-tools"
@@ -103,32 +115,39 @@ cat cb.sh |
 	> "$TOOLS_DIR/cb" || exit 31
 
 ## for tool in go gvt cobra ego elm psc pulp upx ; do
-for tool in go gvt cobra ego gometalinter oden elm upx make ; do
+# for tool in go gvt cobra ego gometalinter oden elm elm-server elm-ui upx make ; do
+for tool in go gvt cobra ego gometalinter oden upx make ; do
 	## cat > "$TOOLS_DIR/$tool" <<EOF
-	cat <<EOF | sed -e "s%^# Copyright.*%$COPYRIGHT%" > "$TOOLS_DIR/$tool"
-#!/bin/bash
-#
-# Copyright © 2016 - present:  Conti Guy  <mrcs.contiguy@mailnull.com>
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+	#~ cat <<EOF | sed -e "s%^# Copyright.*%$COPYRIGHT%" > "$TOOLS_DIR/$tool"
+#~ #!/bin/bash
+#~ #
+#~ # Copyright © 2016 - present:  Conti Guy  <mrcs.contiguy@mailnull.com>
+#~ #
+#~ # Licensed under the Apache License, Version 2.0 (the "License");
+#~ # you may not use this file except in compliance with the License.
+#~ # You may obtain a copy of the License at
+#~ #
+#~ #     http://www.apache.org/licenses/LICENSE-2.0
+#~ #
+#~ # Unless required by applicable law or agreed to in writing, software
+#~ # distributed under the License is distributed on an "AS IS" BASIS,
+#~ # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#~ # See the License for the specific language governing permissions and
+#~ # limitations under the License.
+#~ 
+#~ #
+#~ # containerizing wrapper for $tool
+#~ #
+#~ 
+#~ # any options for docker run, e.g. port mappings, volume mappings, etc.
+#~ #  can be defined in this environment variable:
+#~ export CB_DOCKER_RUN_OPTS="-p 8001:8001 -p 8002:8002 -p 8003:8003"
+#~ 
+#~ cb $tool "\$@"
+#~ 
+#~ EOF
 
-#
-# containerizing wrapper for $tool
-#
-
-cb $tool "\$@"
-
-EOF
+	mkScript "$TOOLS_DIR" "$tool" "$COPYRIGHT"
 
 done
 

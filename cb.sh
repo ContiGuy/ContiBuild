@@ -67,6 +67,10 @@ fi
 ##SCR_DIR="/go/src/$GOPKG"
 W="-w /go/src/$GOPKG"
 
+DEV_HOME="/home/developer"
+VHOME="-v $HOME:$DEV_HOME"
+EHOME="-e HOME=$DEV_HOME"
+
 #if echo "$*" | grep -e "^elm " -e "^psc " -e "^pulp " -e "^bower "  > /dev/null ; then
 #	V="-v $(pwd):$SCR_DIR"
 #	W="-w $SCR_DIR"
@@ -102,15 +106,15 @@ if echo "$*" | grep -e go | grep -e doc | grep -e '-http=:' > /dev/null ; then
 	PORTS="$PORTS $(cobui port $godocPort)"
 fi
 
-$SUDO docker run \
-	-t --rm \
-	$V $VBIN $W \
-	-e "HOME=/tmp" \
-	$PROXY \
-	$PORTS \
+$SUDO docker run         \
+	-t --rm              \
+	$V $VBIN $W          \
+	$VHOME               \
+	$EHOME               \
+	$PROXY               \
+	$PORTS               \
 	-u $(id -u):$(id -g) \
-	"$DOCKER_IMAGE" \
+	$CB_DOCKER_RUN_OPTS  \
+	"$DOCKER_IMAGE"      \
 	"$@"
 
-	## bash -c "$@"
-	## "$@"

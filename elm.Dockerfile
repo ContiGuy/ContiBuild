@@ -1,4 +1,39 @@
-FROM conti-guy/conti-build
+FROM ubuntu
+
+# ARG UserID
+# ARG GroupID
+
+#
+# setup Elm environment
+#
+
+# install npm
+RUN apt-get update
+# RUN apt-get install -y curl nodejs
+# RUN apt-get install -y npm
+RUN apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+# RUN curl -sL https://deb.nodesource.com/setup | bash -
+
+## curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+RUN apt-get install -y nodejs
+# RUN apt-get install -y npm
+
+# RUN wget https://deb.nodesource.com/setup_6.x | bash -
+# RUN apt-get install -y npm
+
+##RUN npm install -g npm || cat /npm-debug.log
+
+# RUN apt-get update
+# RUN apt-get install -y nodejs
+
+# install elm
+RUN npm install -g elm
+RUN npm install -g elm-ui
+
+EXPOSE 8001
+EXPOSE 8002
+EXPOSE 8003
 
 ARG UserID
 ARG GroupID
@@ -7,11 +42,6 @@ ARG OdenVersion
 #
 # play around
 #
-RUN npm install -g elm-ui
-
-EXPOSE 8001
-EXPOSE 8002
-EXPOSE 8003
 
 
 # RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
