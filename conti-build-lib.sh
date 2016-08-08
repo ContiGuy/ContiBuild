@@ -52,6 +52,7 @@ function mkScript()
 	SCRIPT_DIR="$1"
 	SCRIPT_FNAME="$2"
 	COPYRIGHT="$3"
+	_DOCKER_IMAGE="$4"
 	
 	cat <<EOF | sed -e "s%^# Copyright.*%$COPYRIGHT%" > "$SCRIPT_DIR/$SCRIPT_FNAME"
 #!/bin/bash
@@ -73,6 +74,8 @@ function mkScript()
 #
 # containerizing wrapper for $tool
 #
+
+export CB_DOCKER_IMAGE="$_DOCKER_IMAGE"
 
 # any options for docker run, e.g. port mappings, volume mappings, etc.
 #  can be defined in this environment variable:

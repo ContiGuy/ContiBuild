@@ -1,5 +1,9 @@
 FROM conti-guy/conti-build.base
 
+ARG UserID
+ARG GroupID
+ARG OdenVersion
+
 #
 # setup Elm environment
 #
@@ -53,10 +57,9 @@ RUN cd /go/bin && cp $(ls | grep -v _) /usr/local/go/bin
 RUN gometalinter --install --update
 
 # install Oden
-ARG OdenVersion
 
-RUN apt-get update
-RUN apt-get install -y libpcre3-dev
+# RUN apt-get update
+# RUN apt-get install -y libpcre3-dev
 
 RUN mkdir -p /source
 WORKDIR /source
@@ -75,12 +78,11 @@ RUN cp -R lib/* /usr/local/go/lib
 
 
 # add some more useful tools
+RUN apt-get update
 RUN apt-get install -y upx
 
 
 # # create a non root developer user with the same user id as the developer who builds the docker image so that later the built files can be owned by him
-ARG UserID
-ARG GroupID
 # RUN addgroup --gid "${GroupID}" developer
 
 # # FIXME: need to prevent interactive output

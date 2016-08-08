@@ -23,8 +23,14 @@
 # don't change this! - needed if docker needs to be run via sudo
 # SUDO=sudo
 
-# don't change this! - needed if docker needs to be run via sudo
-DOCKER_IMAGE=zZz
+DOCKER_IMAGE_GOBASE="conti-guy/conti-build.base"
+DOCKER_IMAGE_GOTOOLS="conti-guy/conti-build"
+DOCKER_IMAGE_ELM="conti-guy/conti-build.elm"
+if $(echo $* | grep elm > /dev/null) ; then
+	DOCKER_IMAGE="${CB_DOCKER_IMAGE:-$DOCKER_IMAGE_ELM}"
+else
+	DOCKER_IMAGE="${CB_DOCKER_IMAGE:-$DOCKER_IMAGE_GOTOOLS}"
+fi
 
 ##SCR_DIR=/source
 

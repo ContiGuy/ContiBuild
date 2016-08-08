@@ -7,11 +7,11 @@ ARG OdenVersion
 #
 # play around
 #
-RUN npm install -g elm-ui
+# RUN npm install -g elm-ui
 
-EXPOSE 8001
-EXPOSE 8002
-EXPOSE 8003
+# EXPOSE 8001
+# EXPOSE 8002
+# EXPOSE 8003
 
 
 # RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -

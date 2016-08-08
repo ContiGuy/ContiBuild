@@ -22,11 +22,11 @@ COPYRIGHT='# Copyright © 2016 - present:  Conti Guy  <mrcs.contiguy@mailnull.co
 
 ODEN_VERSION="--build-arg OdenVersion=0.3.5"
 
-DOCKER_IMAGE_BASE="conti-guy/conti-build.base"
-DOCKER_IMAGE_ENV="conti-guy/conti-build"
-DOCKER_IMAGE_FINAL="conti-guy/conti-build.add"
-
+DOCKER_IMAGE_GOBASE="conti-guy/conti-build.base"
+DOCKER_IMAGE_GOTOOLS="conti-guy/conti-build"
 DOCKER_IMAGE_ELM="conti-guy/conti-build.elm"
+
+#~ DOCKER_IMAGE_FINAL="conti-guy/conti-build.add"
 
 . conti-build-lib.sh
 
@@ -44,45 +44,14 @@ fi
 
 USER_IDs="--build-arg UserID=$(id -u) --build-arg GroupID=$(id -g)"
 
-docker_build base Dockerfile.base "$DOCKER_IMAGE_BASE" 33
-#~ echo "building base docker image ..."
-#~ if $SUDO docker build -f Dockerfile.base -t "$DOCKER_IMAGE_BASE" $PROXY $USER_IDs . ; then
-	#~ echo "done."
-#~ else
-	#~ echo "FAILED. ABORT."
-	#~ exit 29
-#~ fi
+docker_build base go.Dockerfile "$DOCKER_IMAGE_GOBASE" 33
 
-docker_build extended Dockerfile.ext "$DOCKER_IMAGE_ENV" 43
-#~ echo "building extended docker image ..."
-#~ if $SUDO docker build -f Dockerfile.ext -t "$DOCKER_IMAGE_ENV" $PROXY $USER_IDs $ODEN_VERSION . ; then
-	#~ echo "done."
-#~ else
-	#~ echo "FAILED. ABORT."
-	#~ exit 29
-#~ fi
+docker_build extended go-tools.Dockerfile "$DOCKER_IMAGE_GOTOOLS" 43
 
-docker_build playground Dockerfile.add "$DOCKER_IMAGE_FINAL" 53
-#~ echo "building playground docker image ..."
-#~ if $SUDO docker build -f Dockerfile.add -t "$DOCKER_IMAGE_FINAL" $PROXY $USER_IDs . ; then
-	#~ echo "done."
-#~ else
-	#~ echo "FAILED. ABORT."
-	#~ exit 29
-#~ fi
-
+#~ docker_build playground Dockerfile.add "$DOCKER_IMAGE_FINAL" 53
 
 # DOCKER_IMAGE_ELM="conti-guy/conti-build.elm"
-
 docker_build elm elm.Dockerfile "$DOCKER_IMAGE_ELM" 63
-#~ echo "building elm docker image ..."
-#~ if $SUDO docker build -f elm.Dockerfile -t "$DOCKER_IMAGE_ELM" $PROXY $USER_IDs . ; then
-	#~ echo "done."
-#~ else
-	#~ echo "FAILED. ABORT."
-	#~ exit 29
-#~ fi
-
 
 
 TOOLS_DIR="$(pwd)/conti-build-tools"
@@ -97,7 +66,7 @@ if $SUDO docker run \
 	$LT \
 	-e "HOME=/tmp" \
 	-u $(id -u):$(id -g) \
-	"$DOCKER_IMAGE_ENV" \
+	"$DOCKER_IMAGE_GOTOOLS" \
 	bash -c "[ -d /conti-build-tools ] && cp /go/bin/cobui /conti-build-tools" ; then
 
 	## bash -c "[ -d /conti-build-tools ] && cp /go/bin/gopath /go/bin/windows_amd64/gopath.exe /conti-build-tools" ; then
@@ -110,44 +79,25 @@ fi
 
 cat cb.sh |
 	sed -e "s%^# SUDO=.*%SUDO=$SUDO%" \
-		-e "s%^DOCKER_IMAGE=.*%DOCKER_IMAGE='$DOCKER_IMAGE_FINAL'%" \
 		-e "s%^# Copyright.*%$COPYRIGHT%" \
+		-e "s%CbDockerDefaultImage%$DOCKER_IMAGE_GOTOOLS%" \
 	> "$TOOLS_DIR/cb" || exit 31
+
+		#~ -e "s%^DOCKER_IMAGE=.*%DOCKER_IMAGE='$DOCKER_IMAGE_FINAL'%" \
+
 
 ## for tool in go gvt cobra ego elm psc pulp upx ; do
 # for tool in go gvt cobra ego gometalinter oden elm elm-server elm-ui upx make ; do
 for tool in go gvt cobra ego gometalinter oden upx make ; do
-	## cat > "$TOOLS_DIR/$tool" <<EOF
-	#~ cat <<EOF | sed -e "s%^# Copyright.*%$COPYRIGHT%" > "$TOOLS_DIR/$tool"
-#~ #!/bin/bash
-#~ #
-#~ # Copyright © 2016 - present:  Conti Guy  <mrcs.contiguy@mailnull.com>
-#~ #
-#~ # Licensed under the Apache License, Version 2.0 (the "License");
-#~ # you may not use this file except in compliance with the License.
-#~ # You may obtain a copy of the License at
-#~ #
-#~ #     http://www.apache.org/licenses/LICENSE-2.0
-#~ #
-#~ # Unless required by applicable law or agreed to in writing, software
-#~ # distributed under the License is distributed on an "AS IS" BASIS,
-#~ # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#~ # See the License for the specific language governing permissions and
-#~ # limitations under the License.
-#~ 
-#~ #
-#~ # containerizing wrapper for $tool
-#~ #
-#~ 
-#~ # any options for docker run, e.g. port mappings, volume mappings, etc.
-#~ #  can be defined in this environment variable:
-#~ export CB_DOCKER_RUN_OPTS="-p 8001:8001 -p 8002:8002 -p 8003:8003"
-#~ 
-#~ cb $tool "\$@"
-#~ 
-#~ EOF
 
-	mkScript "$TOOLS_DIR" "$tool" "$COPYRIGHT"
+	mkScript "$TOOLS_DIR" "$tool" "$COPYRIGHT" "$DOCKER_IMAGE_GOTOOLS"
+
+done
+
+# for tool in go gvt cobra ego gometalinter oden elm elm-server elm-ui upx make ; do
+for tool in elm elm-server elm-ui ; do
+
+	mkScript "$TOOLS_DIR" "$tool" "$COPYRIGHT" "$DOCKER_IMAGE_ELM"
 
 done
 
