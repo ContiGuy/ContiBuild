@@ -22,8 +22,8 @@ COPYRIGHT='# Copyright © 2016 - present:  Conti Guy  <mrcs.contiguy@mailnull.co
 
 ODEN_VERSION="--build-arg OdenVersion=0.3.5"
 
-DOCKER_IMAGE_GOBASE="conti-guy/conti-build.base"
-DOCKER_IMAGE_GOTOOLS="conti-guy/conti-build"
+DOCKER_IMAGE_GO="conti-guy/conti-build.go"
+#~ DOCKER_IMAGE_GOTOOLS="conti-guy/conti-build"
 DOCKER_IMAGE_ELM="conti-guy/conti-build.elm"
 
 #~ DOCKER_IMAGE_FINAL="conti-guy/conti-build.add"
@@ -44,9 +44,10 @@ fi
 
 USER_IDs="--build-arg UserID=$(id -u) --build-arg GroupID=$(id -g)"
 
-docker_build base go.Dockerfile "$DOCKER_IMAGE_GOBASE" 33
+#~ docker_build base go.Dockerfile "$DOCKER_IMAGE_GOBASE" 33
+docker_build go go.Dockerfile "$DOCKER_IMAGE_GO" 33
 
-docker_build extended go-tools.Dockerfile "$DOCKER_IMAGE_GOTOOLS" 43
+#~ docker_build extended go-tools.Dockerfile "$DOCKER_IMAGE_GOTOOLS" 43
 
 #~ docker_build playground Dockerfile.add "$DOCKER_IMAGE_FINAL" 53
 
@@ -66,7 +67,7 @@ if $SUDO docker run \
 	$LT \
 	-e "HOME=/tmp" \
 	-u $(id -u):$(id -g) \
-	"$DOCKER_IMAGE_GOTOOLS" \
+	"$DOCKER_IMAGE_GO" \
 	bash -c "[ -d /conti-build-tools ] && cp /go/bin/cobui /conti-build-tools" ; then
 
 	## bash -c "[ -d /conti-build-tools ] && cp /go/bin/gopath /go/bin/windows_amd64/gopath.exe /conti-build-tools" ; then
@@ -80,7 +81,7 @@ fi
 cat cb.sh |
 	sed -e "s%^# SUDO=.*%SUDO=$SUDO%" \
 		-e "s%^# Copyright.*%$COPYRIGHT%" \
-		-e "s%CbDockerDefaultImage%$DOCKER_IMAGE_GOTOOLS%" \
+		-e "s%CbDockerDefaultImage%$DOCKER_IMAGE_GO%" \
 	> "$TOOLS_DIR/cb" || exit 31
 
 		#~ -e "s%^DOCKER_IMAGE=.*%DOCKER_IMAGE='$DOCKER_IMAGE_FINAL'%" \
@@ -90,7 +91,7 @@ cat cb.sh |
 # for tool in go gvt cobra ego gometalinter oden elm elm-server elm-ui upx make ; do
 for tool in go gvt cobra ego gometalinter oden upx make ; do
 
-	mkScript "$TOOLS_DIR" "$tool" "$COPYRIGHT" "$DOCKER_IMAGE_GOTOOLS"
+	mkScript "$TOOLS_DIR" "$tool" "$COPYRIGHT" "$DOCKER_IMAGE_GO"
 
 done
 

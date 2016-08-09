@@ -79,7 +79,7 @@ RUN cp -R lib/* /usr/local/go/lib
 
 # add some more useful tools
 RUN apt-get update
-RUN apt-get install -y upx
+RUN apt-get install -y upx zip
 
 
 # # create a non root developer user with the same user id as the developer who builds the docker image so that later the built files can be owned by him
