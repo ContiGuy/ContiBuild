@@ -2,7 +2,7 @@
 #
 # delete all docker container and images
 
-[ docker version 2> /dev/null ] || SUDO=sudo
+docker version 2> /dev/null || SUDO=sudo
 
 #~ FILTER="head -1"
 FILTER="cat"

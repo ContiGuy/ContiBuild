@@ -86,30 +86,19 @@ cat cb.sh |
 
 		#~ -e "s%^DOCKER_IMAGE=.*%DOCKER_IMAGE='$DOCKER_IMAGE_FINAL'%" \
 
-
-## for tool in go gvt cobra ego elm psc pulp upx ; do
-# for tool in go gvt cobra ego gometalinter oden elm elm-server elm-ui upx make ; do
+# create wrappers for go tools
 for tool in go gvt cobra ego gometalinter oden upx make ; do
-
 	mkScript "$TOOLS_DIR" "$tool" "$COPYRIGHT" "$DOCKER_IMAGE_GO"
-
 done
 
-# for tool in go gvt cobra ego gometalinter oden elm elm-server elm-ui upx make ; do
+# create wrappers for elm tools
 for tool in elm elm-server elm-ui ; do
-
 	mkScript "$TOOLS_DIR" "$tool" "$COPYRIGHT" "$DOCKER_IMAGE_ELM"
-
 done
 
 chmod a+x "$TOOLS_DIR"/*                                      || exit 32
 
 export PATH="$TOOLS_DIR:$PATH"
-
-# echo "#"
-# echo "# the following tools are available for you now:"
-# echo "#"
-
 export GOPATH=/tmp/conti-build/test-$$/go
 DIR="$GOPATH/src/trial"
 if mkdir -p "$DIR" && cd "$DIR" ; then :
@@ -118,40 +107,7 @@ else
 	exit 47
 fi
 
-# echo
-# echo "### go tools ###"
-# # set -x
-# cb go version
-# echo
-# cb gvt help
-# echo
-# cb cobra help
-# echo
-# cb ego --version
-# echo
-# 
-# echo
-# echo "### elm tools ###"
-# cb elm make --version
-# echo
-# cb elm package --help
-# echo
-# echo "elm repl"
-# cb elm repl --version
-# echo
-# # cb elm reactor --version
-# 
-# # echo
-# # echo "### PureScript tools ###"
-# # # echo "psc # PureScript compiler"
-# # cb psc --help
-# # echo
-# # cb pulp --help
-# # set +x
 
-# echo
-# echo "SUCCESS!!  please make sure the tools in the local folder 'conti-build-tools' are in your PATH"
-# echo
 echo "#"
 echo "# SUCCESS."
 echo "#"
@@ -159,6 +115,5 @@ echo "# the following tools are available for you now"
 echo "#  ( please make sure they are in your PATH ) :"
 echo "#"
 
-# file "$(basename $TOOLS_DIR)"/*
-file "$TOOLS_DIR"/*   ## | sed -e "s:$(basename $TOOLS_DIR)/::"
+file "$TOOLS_DIR"/*
 
